@@ -7,6 +7,7 @@ import { BuyServiceDto } from './dto/buy-service.dto';
 import { conversationEntity } from './entities/conversation.entity';
 import { GptService } from './services/gpt.service';
 import { UserEntity } from '../user/entities/user.entity';
+import { DalleService } from './services/dalle.service';
 
 @Injectable()
 export class AiServiceService {
@@ -16,6 +17,8 @@ export class AiServiceService {
     private conversationRepository: Repository<conversationEntity>,
     @Inject(forwardRef(() => GptService))
     private gptService: GptService,
+    @Inject(forwardRef(() => DalleService))
+    private dalleService: DalleService,
 
   ) { }
 
@@ -59,6 +62,17 @@ export class AiServiceService {
 
     if (buyService.serviceType === 'gpt') {
       const response = await this.gptService.gptChat(conversationId, content);
+      await this.newMessage(conversationId, response);
+
+
+      return {
+        conversation,
+        response,
+      };
+    }
+
+    if (buyService.serviceType === 'dalle') {
+      const response = await this.dalleService.dalleChat(conversationId, content);
       await this.newMessage(conversationId, response);
 
 

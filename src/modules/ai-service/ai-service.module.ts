@@ -6,6 +6,7 @@ import { UserModule } from '../user/user.module';
 import { GptService } from './services/gpt.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { conversationEntity } from './entities/conversation.entity';
+import { DalleService } from './services/dalle.service';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { conversationEntity } from './entities/conversation.entity';
     forwardRef(() => AiServiceModule),
   ],
   controllers: [AiServiceController],
-  providers: [AiServiceService, GptService],
-  exports: [AiServiceService, GptService],
+  providers: [AiServiceService, GptService, DalleService],
+  exports: [AiServiceService, GptService, DalleService],
 })
-export class AiServiceModule { } 
+export class AiServiceModule { }

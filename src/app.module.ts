@@ -9,6 +9,7 @@ import { AiServiceModule } from './modules/ai-service/ai-service.module';
 import { WalletService } from './modules/wallet/wallet.service';
 
 
+
 @Module({
   imports: [
     ConfigModule.forRoot({
