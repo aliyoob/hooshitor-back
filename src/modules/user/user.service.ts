@@ -22,5 +22,8 @@ export class UserService {
   findOne(mobile: string) {
     return this.userRepository.findOne({ where: { mobile }, relations: ['wallet'] });
   }
+  findOneCoversetions(mobile: string) {
+    return this.userRepository.findOne({ where: { mobile }, relations: ['wallet', 'conversations'] });
+  }
 
 }
