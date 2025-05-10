@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, Prim
 import { OTPEntity } from "./otp.entity";
 import { Wallet } from "src/modules/wallet/entities/wallet.entity";
 import { conversationEntity } from "../../ai-service/entities/conversation.entity";
+import { threadEntity } from "src/modules/ai-service/entities/threads.entity";
 
 @Entity("user")
 export class UserEntity {
@@ -33,6 +34,9 @@ export class UserEntity {
 
     @OneToMany(() => conversationEntity, (conversation) => conversation.user, { cascade: true })
     conversations: conversationEntity[];
+
+    @OneToMany(() => threadEntity, (thread) => thread.user, { cascade: true })
+    threads: threadEntity[];
 
     @CreateDateColumn()
     created_at: Date;

@@ -23,7 +23,7 @@ export class UserService {
     return this.userRepository.findOne({ where: { mobile }, relations: ['wallet'] });
   }
   findOneCoversetions(mobile: string) {
-    return this.userRepository.findOne({ where: { mobile }, relations: ['wallet', 'conversations'] });
+    return this.userRepository.findOne({ where: { mobile }, relations: ['wallet', 'conversations', 'threads'] });
   }
 
 }

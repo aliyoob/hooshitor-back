@@ -60,17 +60,6 @@ export class AiServiceService {
 
     const conversation = await this.newMessage(conversationId, content);
 
-    if (buyService.serviceType === 'gpt') {
-      const response = await this.gptService.gptChat(conversationId, content);
-      await this.newMessage(conversationId, response);
-
-
-      return {
-        conversation,
-        response,
-      };
-    }
-
     if (buyService.serviceType === 'dalle') {
       const response = await this.dalleService.dalleChat(conversationId, content);
       await this.newMessage(conversationId, response);

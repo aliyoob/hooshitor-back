@@ -7,13 +7,18 @@ import { GptService } from './services/gpt.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { conversationEntity } from './entities/conversation.entity';
 import { DalleService } from './services/dalle.service';
+import { HttpModule } from '@nestjs/axios';
+import { threadEntity } from './entities/threads.entity';
+import { WalletModule } from '../wallet/wallet.module';
 
 @Module({
   imports: [
     AuthModule,
     UserModule,
-    TypeOrmModule.forFeature([conversationEntity]),
+    WalletModule,
+    TypeOrmModule.forFeature([conversationEntity, threadEntity]),
     forwardRef(() => AiServiceModule),
+    HttpModule, // Added HttpModule to provide HttpService
   ],
   controllers: [AiServiceController],
   providers: [AiServiceService, GptService, DalleService],

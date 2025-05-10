@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { AiServiceService } from './ai-service.service';
 import { CreateAiServiceDto } from './dto/create-ai-service.dto';
 import { UpdateAiServiceDto } from './dto/update-ai-service.dto';
@@ -7,12 +7,19 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { UserEntity } from '../user/entities/user.entity';
 import { BuyServiceDto } from './dto/buy-service.dto';
 import { UserService } from '../user/user.service';
+import { GptService } from './services/gpt.service';
+import { WalletService } from '../wallet/wallet.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Controller('service')
 export class AiServiceController {
   constructor(
     private readonly aiServiceService: AiServiceService,
     private readonly userService: UserService,
+    private readonly gptService: GptService,
+    private readonly walletService: WalletService,
 
   ) { }
 
@@ -51,4 +58,67 @@ export class AiServiceController {
       conversation,
     };
   }
+
+
+  @Post('chat')
+  @UseGuards(AuthGuard)
+  async chat(@CurrentUser() user: UserEntity, @Body() body: { message: string; thread_id?: string }) {
+    await this.walletService.subtractBalance(user.mobile, 100);
+    const threadId = body.thread_id || await this.gptService.createThread(user);
+    await this.gptService.addMessage(threadId, body.message);
+    const runId = await this.gptService.runAssistant(threadId);
+    await this.gptService.waitForRunCompletion(threadId, runId);
+    const response = await this.gptService.getLatestAssistantMessage(threadId);
+
+    return {
+      thread_id: threadId,
+      response,
+    };
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('threads')
+  async getThreads(@CurrentUser() user: UserEntity) {
+
+
+    const userm = await this.userService.findOneCoversetions(user.mobile);
+    const threads = await this.aiServiceService.getConversationsByMobile(user);
+
+    return {
+      threads,
+      userm
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('threads/messages')
+  async getThreadMessages(@CurrentUser() user: UserEntity, @Body() body: { threadId: string }) {
+    const threadId = body.threadId;
+    const messages = await this.gptService.getThreadMessages(threadId);
+
+    return {
+      messages,
+      threadId
+    }
+  }
+
+  @Post('voicetext')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads', // مطمئن شو این پوشه وجود داره
+        filename: (req, file, cb) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
+        },
+      }),
+      limits: { fileSize: 10 * 1024 * 1024 }, // حداکثر 10MB
+    }),
+  )
+  async uploadVoice(@UploadedFile() file: Express.Multer.File) {
+    const transcription = await this.gptService.transcribeAudio(file.path);
+    return { text: transcription };
+  }
+
+
 }
