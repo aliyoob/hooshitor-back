@@ -22,12 +22,21 @@ export class AiServiceService {
 
   ) { }
 
-  async newMessage(conversationId: number, content: string) {
+  async newMessage(conversationId: number, content: string | Buffer) {
     let messagee;
+    console.log('newMessage', conversationId, content);
 
     const conversation = await this.conversationRepository.findOne({ where: { id: conversationId } });
     if (conversation) {
-      conversation.messages.push(content);
+      if (Buffer.isBuffer(content)) {
+        content = content.toString('utf-8');
+      }
+      if (typeof content !== 'string') {
+        throw new TypeError('Content must be a string');
+      }
+      // Remove null bytes and sanitize content
+      const sanitizedContent = content.replace(/\u0000/g, '').replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+      conversation.messages.push(sanitizedContent);
       await this.conversationRepository.save(conversation);
       messagee = conversation;
     }
@@ -62,6 +71,28 @@ export class AiServiceService {
 
     if (buyService.serviceType === 'dalle') {
       const response = await this.dalleService.dalleChat(conversationId, content);
+      await this.newMessage(conversationId, response);
+
+
+      return {
+        conversation,
+        response,
+      };
+    }
+
+    if (buyService.serviceType === 'stability') {
+      const response = await this.dalleService.stabilityImage(conversationId, content);
+      await this.newMessage(conversationId, response);
+
+
+      return {
+        conversation,
+        response,
+      };
+    }
+
+    if (buyService.serviceType === 'replicate') {
+      const response = await this.dalleService.replicateImage(conversationId, content);
       await this.newMessage(conversationId, response);
 
 

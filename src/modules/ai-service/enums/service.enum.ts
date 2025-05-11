@@ -4,4 +4,6 @@ export enum ServiceType {
     Gemini = 'gemini',
     Dalle = 'dalle',
     MidJourney = 'midjourney',
+    Stability = 'stability',
+    Replicate = 'replicate',
 }
