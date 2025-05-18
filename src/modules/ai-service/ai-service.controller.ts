@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile, Query } from '@nestjs/common';
 import { AiServiceService } from './ai-service.service';
 import { CreateAiServiceDto } from './dto/create-ai-service.dto';
 import { UpdateAiServiceDto } from './dto/update-ai-service.dto';
@@ -12,6 +12,7 @@ import { WalletService } from '../wallet/wallet.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { console } from 'inspector';
 
 @Controller('service')
 export class AiServiceController {
@@ -92,8 +93,8 @@ export class AiServiceController {
 
   @UseGuards(AuthGuard)
   @Get('threads/messages')
-  async getThreadMessages(@CurrentUser() user: UserEntity, @Body() body: { threadId: string }) {
-    const threadId = body.threadId;
+  async getThreadMessages(@CurrentUser() user: UserEntity, @Query('thread_id') threadId: string) {
+    console.log('threadId', threadId);
     const messages = await this.gptService.getThreadMessages(threadId);
 
     return {

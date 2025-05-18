@@ -7,6 +7,7 @@ import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AiServiceModule } from './modules/ai-service/ai-service.module';
 import { WalletService } from './modules/wallet/wallet.service';
+import { ZibalModule } from './modules/zibal/zibal.module';
 
 
 
@@ -20,6 +21,7 @@ import { WalletService } from './modules/wallet/wallet.service';
     AuthModule,
     UserModule,
     AiServiceModule,
+    ZibalModule,
   ],
   controllers: [],
   providers: [],
