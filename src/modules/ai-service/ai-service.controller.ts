@@ -65,7 +65,7 @@ export class AiServiceController {
   @UseGuards(AuthGuard)
   async chat(@CurrentUser() user: UserEntity, @Body() body: { message: string; thread_id?: string }) {
     await this.walletService.subtractBalance(user.mobile, 100);
-    const threadId = body.thread_id || await this.gptService.createThread(user);
+    const threadId = body.thread_id || await this.gptService.createThread(body.message, user);
     await this.gptService.addMessage(threadId, body.message);
     const runId = await this.gptService.runAssistant(threadId);
     await this.gptService.waitForRunCompletion(threadId, runId);

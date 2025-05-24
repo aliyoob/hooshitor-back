@@ -29,13 +29,15 @@ export class GptService {
     }
 
 
-    async createThread(user: UserEntity): Promise<string> {
+    async createThread(content: string, user: UserEntity): Promise<string> {
         const response = await firstValueFrom(
             this.http.post(`${this.baseUrl}/threads`, {}, { headers: this.headers() }),
         );
         const threadId = response.data.id;
         const newTread = this.threads.create({ threadIds: [], user });
         newTread.threadIds.push(threadId);
+        const sunbject = await this.shortenContent(content);
+        newTread.subject = sunbject;
         await this.threads.save(newTread);
         return threadId;
     }
@@ -54,7 +56,7 @@ export class GptService {
         const response = await firstValueFrom(
             this.http.post(
                 `${this.baseUrl}/threads/${threadId}/runs`,
-                { assistant_id: process.env.ASSISTANT_ID_MINI },
+                { assistant_id: process.env.ASSISTANT_ID },
                 { headers: this.headers() },
             ),
         );
@@ -128,5 +130,12 @@ export class GptService {
     }
 
 
+    async shortenContent(content: string): Promise<string> {
+        if (content.length <= 23) {
+            return content;
+        } else {
+            return content.slice(0, 23) + '...';
+        }
+    }
 
 }

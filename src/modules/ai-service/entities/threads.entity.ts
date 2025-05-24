@@ -19,4 +19,7 @@ export class threadEntity {
     @ManyToOne(() => UserEntity, (user) => user.threads, { onDelete: "CASCADE" })
     @JoinColumn({ name: "user_id" })
     user: UserEntity;
+
+    @Column({ nullable: true })
+    subject: string;
 }
