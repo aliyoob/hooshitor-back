@@ -199,6 +199,28 @@ export class AuthService {
     return hashSync(password, salt);
   }
 
+  async getMe(mobile: string) {
+    const user = await this.userRepository.findOne({
+      where: { mobile },
+      relations: {
+        wallet: true,
+      }
+    });
+    if (!user) throw new UnauthorizedException("login to your account!")
+    return user;
+  }
+
+  async updateMe(mobile: string, updateMe: { name?: string; }) {
+    const user = await this.userRepository.findOneBy({ mobile });
+    if (!user) throw new UnauthorizedException("login to your account!");
+
+    if (updateMe.name) {
+      user.first_name = updateMe.name;
+    }
+
+    return this.userRepository.save(user);
+  }
+
 
 
 }

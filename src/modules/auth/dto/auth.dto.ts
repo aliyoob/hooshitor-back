@@ -1,4 +1,4 @@
-import { IsMobilePhone, IsString, Length } from "class-validator";
+import { IsMobilePhone, IsString, Length, MinLength } from "class-validator";
 
 export class SendOtpDto {
     @IsMobilePhone("fa-IR")
@@ -12,4 +12,11 @@ export class CheckOtpDto {
     @IsString()
     @Length(5, 5)
     code: string;
+}
+
+export class UpdateMe {
+
+    @IsString()
+    @MinLength(3)
+    name: string;
 }

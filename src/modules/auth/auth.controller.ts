@@ -1,6 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Put } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CheckOtpDto, SendOtpDto } from './dto/auth.dto';
+import { CheckOtpDto, SendOtpDto, UpdateMe } from './dto/auth.dto';
+import { AuthGuard } from './guards/auth.guard';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { UserEntity } from '../user/entities/user.entity';
 
 
 
@@ -18,6 +21,19 @@ export class AuthController {
   checkOtp(@Body() otpDto: CheckOtpDto) {
     return this.authService.checkOtp(otpDto)
   }
+
+  @UseGuards(AuthGuard)
+  @Get('/me')
+  getMe(@CurrentUser() user: UserEntity,) {
+    return this.authService.getMe(user.mobile);
+  }
+
+  @UseGuards(AuthGuard)
+  @Put('/me')
+  updateMe(@CurrentUser() user: UserEntity, @Body() updateMe: UpdateMe) {
+    return this.authService.updateMe(user.mobile, updateMe);
+  }
+
 
 
 
