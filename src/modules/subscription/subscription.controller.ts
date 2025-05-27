@@ -2,13 +2,20 @@ import { Controller, Post, Body, Get, Param, Patch, Delete, NotFoundException } 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SubscriptionPlan } from './entities/subscriptionPlan.entity';
+import { SubscriptionService } from './subscription.service';
 
 @Controller('plans')
 export class SubscriptionPlanController {
   constructor(
     @InjectRepository(SubscriptionPlan)
     private readonly planRepo: Repository<SubscriptionPlan>,
+    private readonly planService: SubscriptionService,
   ) { }
+  @Get('/reset-charges')
+  async resetChargs() {
+    await this.planService.giveDailyCredits();
+    return "rested!"
+  }
 
   // ✅ ساخت پلن جدید
   @Post()
@@ -56,4 +63,5 @@ export class SubscriptionPlanController {
     await this.planRepo.remove(plan);
     return { success: true, message: 'Plan deleted' };
   }
+
 }

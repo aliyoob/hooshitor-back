@@ -89,29 +89,31 @@ export class SubscriptionService {
   async giveDailyCredits(): Promise<void> {
     const now = new Date();
     const today = now.toDateString();
-
     const users = await this.userRepo.find();
 
     for (const user of users) {
-      const sub = await this.subRepo.findOne({
+      const subs = await this.subRepo.find({
         where: {
-          user,
+          user: { id: user.id },
           startDate: LessThanOrEqual(now),
           endDate: MoreThanOrEqual(now),
         },
-        relations: ['plan'],
-        order: { endDate: 'DESC' },
+        relations: ['user', 'plan'],
       });
 
-      if (!sub) {
+      if (subs.length === 0) {
         await this.activateFreePlanForUser(user);
         continue;
       }
 
+      const sub = subs.sort((a, b) => b.plan.price - a.plan.price)[0]; // انتخاب پلن گران‌تر
+      console.log(`Processing user: ${user.mobile}, Subscription Plan: ${sub.plan.name}`);
+
+      // بررسی اینکه آیا اعتبار امروز داده شده است یا خیر
       const alreadyGiven = sub.lastCreditGivenDate?.toDateString() === today;
       if (alreadyGiven) continue;
 
-      const wallet = await this.walletRepo.findOne({ where: { user } });
+      const wallet = await this.walletRepo.findOne({ where: { user: { id: user.id } }, relations: ['user'] });
       if (wallet) {
         wallet.balance = sub.plan.dailyCredit;
         wallet.updated_at = now;
@@ -122,4 +124,7 @@ export class SubscriptionService {
       }
     }
   }
+
+
+
 }

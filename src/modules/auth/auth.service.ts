@@ -207,6 +207,7 @@ export class AuthService {
       where: { mobile },
       relations: {
         wallet: true,
+        subscriptions: true,
       }
     });
     if (!user) throw new UnauthorizedException("login to your account!")
