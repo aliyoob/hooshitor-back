@@ -3,12 +3,12 @@ import axios from 'axios';
 
 @Injectable()
 export class ZibalService {
-  async createPayment(mobile: string, amount: number): Promise<{ trackId: string, payLink: string }> {
+  async createPayment(mobile: string, amount: number, planId: number): Promise<{ trackId: string, payLink: string }> {
 
     const result = await axios.post('https://gateway.zibal.ir/v1/request', {
       merchant: process.env.ZIBAL_MERCHANT_ID,
       amount,
-      callbackUrl: `https://flator.ir/api/zibal/callback?mobile=${mobile}&amount=${amount}`,
+      callbackUrl: `https://flator.ir/api/zibal/callback?mobile=${mobile}&amount=${amount}&planId=${planId}`,
       description: 'افزایش موجودی کیف پول'
     });
 
@@ -29,7 +29,7 @@ export class ZibalService {
       trackId,
     });
 
-    if (response.data.result === 100) {
+    if (response.data.result === 100 || response.data.result === 201) {
       return { success: true, amount: response.data.amount };
     } else {
       return { success: false, amount: 0 };

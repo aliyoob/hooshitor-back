@@ -8,6 +8,9 @@ import { AuthModule } from './modules/auth/auth.module';
 import { AiServiceModule } from './modules/ai-service/ai-service.module';
 import { WalletService } from './modules/wallet/wallet.service';
 import { ZibalModule } from './modules/zibal/zibal.module';
+import { SubscriptionModule } from './modules/subscription/subscription.module';
+import { PurchaseModule } from './modules/purchase/purchase.module';
+
 
 
 
@@ -22,6 +25,8 @@ import { ZibalModule } from './modules/zibal/zibal.module';
     UserModule,
     AiServiceModule,
     ZibalModule,
+    SubscriptionModule,
+    PurchaseModule,
   ],
   controllers: [],
   providers: [],

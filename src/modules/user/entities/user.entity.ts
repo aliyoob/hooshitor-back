@@ -4,6 +4,7 @@ import { Wallet } from "src/modules/wallet/entities/wallet.entity";
 import { conversationEntity } from "../../ai-service/entities/conversation.entity";
 import { threadEntity } from "src/modules/ai-service/entities/threads.entity";
 import { Zibal } from "src/modules/zibal/entities/zibal.entity";
+import { UserSubscription } from "src/modules/subscription/entities/user-subscription.entity";
 
 @Entity("user")
 export class UserEntity {
@@ -41,6 +42,9 @@ export class UserEntity {
 
     @OneToMany(() => Zibal, (zibal) => zibal.user)
     payments: Zibal[];
+
+    @OneToMany(() => UserSubscription, sub => sub.user)
+    subscriptions: UserSubscription[];
 
 
     @CreateDateColumn()

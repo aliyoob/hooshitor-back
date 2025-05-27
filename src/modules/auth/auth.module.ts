@@ -6,9 +6,10 @@ import { UserEntity } from '../user/entities/user.entity';
 import { OTPEntity } from '../user/entities/otp.entity';
 import { JwtService } from '@nestjs/jwt';
 import { WalletModule } from '../wallet/wallet.module';
+import { SubscriptionModule } from '../subscription/subscription.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity, OTPEntity]), WalletModule],
+  imports: [TypeOrmModule.forFeature([UserEntity, OTPEntity]), WalletModule, SubscriptionModule],
   controllers: [AuthController],
   providers: [AuthService, JwtService],
   exports: [AuthService, JwtService, TypeOrmModule]

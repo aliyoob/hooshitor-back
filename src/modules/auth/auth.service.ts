@@ -12,6 +12,7 @@ import axios from 'axios';
 
 import { compareSync, genSaltSync, hashSync } from 'bcrypt';
 import { WalletService } from '../wallet/wallet.service';
+import { SubscriptionService } from '../subscription/subscription.service';
 
 
 @Injectable()
@@ -24,6 +25,7 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private walletService: WalletService,
+    private subService: SubscriptionService,
   ) { }
 
   async sendOtp(otpDto: SendOtpDto) {
@@ -39,6 +41,7 @@ export class AuthService {
         wallet
       });
       user = await this.userRepository.save(user);
+      await this.subService.activateFreePlanForUser(user)
     }
     await this.createOtpForUser(user)
   }

@@ -20,24 +20,25 @@ export class ZibalController {
     private userRepository: Repository<UserEntity>,
   ) { }
 
-  @UseGuards(AuthGuard)
-  @Get('pay')
-  async pay(@CurrentUser() user: UserEntity, @Query('amount') amount: number, @Res() res: Response) {
-    const { payLink, trackId } = await this.zibalService.createPayment(user.mobile, Number(amount));
-    console.log('payLink', payLink);
-    res.json({ payLink, trackId });
-  }
+  // @UseGuards(AuthGuard)
+  // @Get('pay')
+  // async pay(@CurrentUser() user: UserEntity, @Query('amount') amount: number, @Res() res: Response) {
+  //   const { payLink, trackId } = await this.zibalService.createPayment(user.mobile, Number(amount));
+  //   console.log('payLink', payLink);
+  //   res.json({ payLink, trackId });
+  // }
 
-  @UseGuards(AuthGuard)
+
   @Get('callback')
   async callback(
     @Query('trackId') trackId: string,
     @Query('mobile') mobile: string,
     @Query('amount') amount: number,
-    @CurrentUser() userT: UserEntity,
+    @Query('planId') planId: number,
+
     @Res() res: Response
   ) {
-    if (mobile !== userT.mobile) {
+    if (!mobile) {
       throw new UnauthorizedException('کاربر مجاز نیست.');
     }
     const verify = await this.zibalService.verifyPayment(trackId);
@@ -58,8 +59,8 @@ export class ZibalController {
     });
 
     if (verify.success) {
-      await this.walletService.addBalance(userT.mobile, Number(amount));
-      return res.send('پرداخت موفق و کیف پول شارژ شد.');
+      // await this.walletService.addBalance(mobile, Number(amount));
+      return res.redirect(`/purchase/zibal/callback?trackId=${trackId}&mobile=${mobile}&amount=${amount}&planId=${planId}`);
     } else {
       return res.send('پرداخت ناموفق بود.');
     }
