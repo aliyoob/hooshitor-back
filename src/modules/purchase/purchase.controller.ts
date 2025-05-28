@@ -29,9 +29,9 @@ export class PurchaseController {
   ) {
     const result = await this.purchaseService.verifyAndActivate(trackId, mobile, planId);
     if (result.success) {
-      return res.redirect('https://flator.ir/panel/subscription/success'); // یا هر آدرسی
+      return res.redirect('http://localhost:5173/?payment=success'); // یا هر آدرسی
     } else {
-      return res.redirect('https://flator.ir/panel/subscription/failure');
+      return res.redirect('http://localhost:5173/?payment=failure');
     }
   }
 }

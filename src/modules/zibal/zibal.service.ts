@@ -8,7 +8,7 @@ export class ZibalService {
     const result = await axios.post('https://gateway.zibal.ir/v1/request', {
       merchant: process.env.ZIBAL_MERCHANT_ID,
       amount,
-      callbackUrl: `https://flator.ir/api/zibal/callback?mobile=${mobile}&amount=${amount}&planId=${planId}`,
+      callbackUrl: `http://localhost:3000/zibal/callback?mobile=${mobile}&amount=${amount}&planId=${planId}`,
       description: 'افزایش موجودی کیف پول'
     });
 

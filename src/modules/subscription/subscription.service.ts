@@ -28,28 +28,19 @@ export class SubscriptionService {
     const endDate = new Date();
     endDate.setDate(now.getDate() + plan.durationInDays);
 
-    // پایان اشتراک قبلی در صورت وجود
-    const existing = await this.subRepo.findOne({
-      where: { user },
-      order: { endDate: 'DESC' },
-    });
-
-    if (existing && existing.endDate > now) {
-      existing.endDate = now;
-      await this.subRepo.save(existing);
-    }
+    // ❌ حذف تمام اشتراک‌های قبلی کاربر
+    await this.subRepo.delete({ user: { id: user.id } });
 
     const newSub = this.subRepo.create({
       user,
       plan,
       startDate: now,
       endDate,
-      lastCreditGivenDate: new Date(0), // اعتبار هنوز داده نشده
+      lastCreditGivenDate: new Date(0),
     });
 
     await this.subRepo.save(newSub);
 
-    // شارژ کیف پول برای روز اول
     const wallet = await this.walletRepo.findOne({ where: { user: { mobile } }, relations: ['user'] });
     if (wallet) {
       wallet.balance = plan.dailyCredit;
@@ -57,6 +48,7 @@ export class SubscriptionService {
       await this.walletRepo.save(wallet);
     }
   }
+
 
   // ✅ فعال‌سازی خودکار پلن رایگان
   async activateFreePlanForUser(user: UserEntity): Promise<void> {
