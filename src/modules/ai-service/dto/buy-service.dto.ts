@@ -13,6 +13,6 @@ export class BuyServiceDto {
     content: string;
 
     @IsNumber()
-    conversationId: number;
+    conversationId: number | null;
 
 }

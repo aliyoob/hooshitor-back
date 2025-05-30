@@ -56,7 +56,7 @@ export class GptService {
         const response = await firstValueFrom(
             this.http.post(
                 `${this.baseUrl}/threads/${threadId}/runs`,
-                { assistant_id: process.env.ASSISTANT_ID },
+                { assistant_id: process.env.ASSISTANT_ID_MINI },
                 { headers: this.headers() },
             ),
         );
