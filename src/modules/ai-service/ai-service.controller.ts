@@ -13,6 +13,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { console } from 'inspector';
+import { ServiceType } from './enums/service.enum';
 
 @Controller('service')
 export class AiServiceController {
@@ -32,7 +33,10 @@ export class AiServiceController {
 
   @UseGuards(AuthGuard)
   @Post('buy')
-  buyService(@CurrentUser() user: UserEntity, @Body() buyServiceDto: BuyServiceDto) {
+  async buyService(@CurrentUser() user: UserEntity, @Body() buyServiceDto: BuyServiceDto) {
+    if (buyServiceDto.serviceType === ServiceType.Replicate) {
+      buyServiceDto.content = await this.aiServiceService.gptTranslate(buyServiceDto.content);
+    }
     return this.aiServiceService.buyService(buyServiceDto, user);
   }
 

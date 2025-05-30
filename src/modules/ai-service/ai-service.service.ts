@@ -104,6 +104,40 @@ export class AiServiceService {
 
   }
 
+  async gptTranslate(content: string) {
+    const systemMessage = {
+      role: 'system',
+      content: 'You are a translation assistant. If the input is in Persian, translate it to English. If it is not in Persian, return it unchanged.',
+    };
+
+    const userMessage = {
+      role: 'user',
+      content: content,
+    };
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [systemMessage, userMessage],
+        temperature: 0,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`OpenAI API Error: ${error}`);
+    }
+
+    const data = await response.json();
+    console.log(data.choices[0].message.content.trim(), "gpt translate");
+    return data.choices[0].message.content.trim();
+  }
+
 
 
 
