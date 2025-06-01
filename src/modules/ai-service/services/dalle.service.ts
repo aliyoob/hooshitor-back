@@ -68,8 +68,30 @@ export class DalleService {
             throw new Error('No image was generated.');
         }
 
+        // Download the image from OpenAI URL
+        const imageUrl = response.data[0].url;
+        const imageResponse = await axios({
+            url: imageUrl,
+            method: 'GET',
+            responseType: 'arraybuffer'
+        });
 
-        return response.data[0].url;
+        // Create uploads directory if it doesn't exist
+        const uploadPath = path.join(process.cwd(), 'uploads');
+        if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath, { recursive: true });
+        }
+
+        // Generate unique filename and save the image
+        const fileName = `dalle-${Date.now()}.png`;
+        const filePath = path.join(uploadPath, fileName);
+
+        await writeFile(filePath, Buffer.from(imageResponse.data));
+
+        // Return URL to the saved image on your server
+        const publicUrl = `http://${process.env.DOMAIN}/uploads/${fileName}`;
+
+        return publicUrl;
     }
 
     async stabilityImage(conversationId: number | null, content: string) {

@@ -8,6 +8,8 @@ import { Repository } from "typeorm";
 import { UserEntity } from "src/modules/user/entities/user.entity";
 import * as fs from 'fs';
 import * as FormData from 'form-data';
+import { conversationEntity } from "../entities/conversation.entity";
+import { text } from "stream/consumers";
 
 @Injectable()
 export class GptService {
@@ -17,7 +19,9 @@ export class GptService {
         private threads: Repository<threadEntity>,
         @Inject(forwardRef(() => AiServiceService))
         private aiService: AiServiceService,
-        private readonly http: HttpService
+        private readonly http: HttpService,
+        @InjectRepository(conversationEntity)
+        private conversationRepository: Repository<conversationEntity>,
     ) { }
 
     private headers() {
@@ -137,5 +141,36 @@ export class GptService {
             return content.slice(0, 23) + '...';
         }
     }
+
+    async transcriptionConversation(filePath: string, userm: UserEntity) {
+        const newConversation = this.conversationRepository.create({ messages: [], user: userm, type: 'voicetotext' });
+        let message = await this.transcribeAudio(filePath);
+        newConversation.messages.push(message);
+        await this.conversationRepository.save(newConversation);
+        console.log("newConversation", newConversation);
+
+        return { message, conversation: newConversation.id };
+
+    }
+
+    async getVoiceTotextConversation(user: UserEntity) {
+        const conversations = await this.conversationRepository.find({
+            where: {
+                user: { id: user.id }, // Use the user's ID for more precise matching
+                type: 'voicetotext'
+            },
+            order: { created_at: 'DESC' },
+            relations: ['user'], // Include user relation to ensure it's properly loaded
+        });
+
+        if (conversations.length === 0) {
+            console.log(`No voice-to-text conversations found for user ID ${user.id}`);
+        } else {
+            console.log(`Found ${conversations.length} conversations for user ID ${user.id}`);
+        }
+
+        return conversations;
+    }
+
 
 }

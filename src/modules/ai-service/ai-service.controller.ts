@@ -34,6 +34,18 @@ export class AiServiceController {
   @UseGuards(AuthGuard)
   @Post('buy')
   async buyService(@CurrentUser() user: UserEntity, @Body() buyServiceDto: BuyServiceDto) {
+    if (buyServiceDto.serviceType === "wallee") {
+      buyServiceDto.serviceType = ServiceType.Replicate
+    }
+    // sub wallet 
+    if (buyServiceDto.serviceType === ServiceType.Dalle) {
+      await this.walletService.subtractBalance(user.mobile, 800);
+    }
+    if (buyServiceDto.serviceType === ServiceType.Replicate) {
+      await this.walletService.subtractBalance(user.mobile, 250);
+    }
+
+
     if (buyServiceDto.serviceType === ServiceType.Replicate) {
       buyServiceDto.content = await this.aiServiceService.gptTranslate(buyServiceDto.content);
     }
@@ -107,6 +119,7 @@ export class AiServiceController {
     }
   }
 
+  @UseGuards(AuthGuard)
   @Post('voicetext')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -120,9 +133,16 @@ export class AiServiceController {
       limits: { fileSize: 10 * 1024 * 1024 }, // حداکثر 10MB
     }),
   )
-  async uploadVoice(@UploadedFile() file: Express.Multer.File) {
-    const transcription = await this.gptService.transcribeAudio(file.path);
-    return { text: transcription };
+  async uploadVoice(@CurrentUser() user: UserEntity, @UploadedFile() file: Express.Multer.File) {
+
+    const transcription = await this.gptService.transcriptionConversation(file.path, user);
+    return { text: transcription.message, conversationId: transcription.conversation };
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('getvoicetotext')
+  async getVoiceToText(@CurrentUser() user: UserEntity) {
+    return this.gptService.getVoiceTotextConversation(user);
   }
 
 

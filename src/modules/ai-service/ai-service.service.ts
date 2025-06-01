@@ -1,6 +1,5 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 
 import { UserService } from '../user/user.service';
 import { BuyServiceDto } from './dto/buy-service.dto';
@@ -8,6 +7,7 @@ import { conversationEntity } from './entities/conversation.entity';
 import { GptService } from './services/gpt.service';
 import { UserEntity } from '../user/entities/user.entity';
 import { DalleService } from './services/dalle.service';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AiServiceService {
@@ -52,7 +52,13 @@ export class AiServiceService {
   }
 
   async getConversationsByMobile(user: UserEntity) {
-    return this.conversationRepository.findOne({ where: { user: user } });
+    console.log("inja")
+    return this.conversationRepository.find({
+      where: {
+        user: user,
+        type: IsNull(),
+      }
+    });
   }
 
 

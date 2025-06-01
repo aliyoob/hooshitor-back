@@ -10,7 +10,8 @@ export class conversationEntity {
     @Column("simple-array", { nullable: true })
     messages: string[];
 
-
+    @Column("varchar", { nullable: true })
+    type: string | null;
 
     @CreateDateColumn()
     created_at: Date;

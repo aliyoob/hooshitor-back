@@ -23,7 +23,14 @@ export class UserService {
     return this.userRepository.findOne({ where: { mobile }, relations: ['wallet'] });
   }
   findOneCoversetions(mobile: string) {
-    return this.userRepository.findOne({ where: { mobile }, relations: ['wallet', 'conversations', 'threads'] });
+    return this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.wallet', 'wallet')
+      .leftJoinAndSelect('user.threads', 'threads')
+      .leftJoinAndSelect('user.conversations', 'conversations', 'conversations.type IS NULL')
+      .where('user.mobile = :mobile', { mobile })
+      .getOne();
+
   }
 
 }
