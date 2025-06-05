@@ -67,10 +67,10 @@ export class AuthService {
     // console.log(otp)
     console.log('در حال ارسال پیامک به Kavenegar با اطلاعات زیر:');
 
-    const apiKey = this.configService.get("Sms.smsApiToken");
-    const url = `https://api.kavenegar.com/v1/${apiKey}/verify/lookup.json`;
-    console.log(otp.code)
-    console.log(user.mobile)
+    // const apiKey = this.configService.get("Sms.smsApiToken");
+    // const url = `https://api.kavenegar.com/v1/${apiKey}/verify/lookup.json`;
+    // console.log(otp.code)
+    // console.log(user.mobile)
     // const response = await axios.get(url, {
     //   params: {
     //     receptor: user.mobile,
@@ -78,9 +78,9 @@ export class AuthService {
     //     template: 'flatorlogin',
     //   }
     // });
-    // , headers: {
-    //   "Content-Type": "application/x-www-form-urlencoded",
-    // }
+
+    await this.sendSms(user.mobile, otp.code, 'flatorlogin');
+    // console.log('پیامک با موفقیت ارسال شد:', response.data);
 
 
 
@@ -154,24 +154,21 @@ export class AuthService {
     }
   }
 
-  async sendSms(receptor, token: any, template: string) {
-    const apiKey = this.configService.get("Sms.smsApiToken");
-
+  async sendSms(receptor, token: string, template: string) {
+    const apiKey = process.env.SMS
 
     const url = `https://api.kavenegar.com/v1/${apiKey}/verify/lookup.json`;
 
     try {
       console.log('در حال ارسال پیامک به Kavenegar با اطلاعات زیر:');
       console.log('receptor:', receptor);
-      console.log('token:', token.code);
+      console.log('token:', token);
       console.log('template:', template);
       const response = await axios.get(url, {
         params: {
           receptor,
-          token: token.code,
+          token: token,
           template
-        }, headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
         }
       });
 
