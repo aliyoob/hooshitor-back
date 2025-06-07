@@ -5,17 +5,20 @@ export function TypeOrmDbConfig(): TypeOrmModuleOptions {
 
 
     return {
-        type: "postgres",
-        port: +DB_PORT!,
+        type: 'postgres',
         host: DB_HOST,
-        database: DB_NAME,
+        port: +DB_PORT!,
         username: DB_USERNAME,
         password: DB_PASSWORD,
+        database: DB_NAME,
         synchronize: true,
         autoLoadEntities: false,
         entities: [
-            "dist/**/**/**/*.entity{.ts,.js}",
-            "dist/**/**/*.entity{.ts,.js}",
+            'dist/**/**/**/*.entity{.ts,.js}',
+            'dist/**/**/*.entity{.ts,.js}',
         ],
-    }
+        ssl: {
+            rejectUnauthorized: false, // برای جلوگیری از خطاهای مربوط به گواهینامه
+        },
+    };
 }
