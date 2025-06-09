@@ -1,0 +1,22 @@
+version: '3'
+services:
+  nest:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - db
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: wallee
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: anstrongpasswallee
+    volumes:
+      - nest_postgres_data:/var/lib/postgresql/data/
+
+volumes:
+  nest_postgres_data:

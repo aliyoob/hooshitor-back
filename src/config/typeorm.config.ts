@@ -6,13 +6,12 @@ export function TypeOrmDbConfig(): TypeOrmModuleOptions {
 
     return {
         type: "postgres",
-        port: +DB_PORT!,
-        host: DB_HOST,
-        database: DB_NAME,
-        username: DB_USERNAME,
-        password: DB_PASSWORD,
+        port: 5432,
+        host: "db",
+        database: "wallee",
+        username: "root",
+        password: "anstrongpasswallee",
         synchronize: true,
-        autoLoadEntities: false,
         entities: [
             "dist/**/**/**/*.entity{.ts,.js}",
             "dist/**/**/*.entity{.ts,.js}",
